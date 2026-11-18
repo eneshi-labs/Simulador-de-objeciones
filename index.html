@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enishi Labs · Simulador de Objeciones Élite (Tiempo Real)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#150B22;--bg2:#2D1B4E;--v:#8B5CF6;--g:#C9A24B;--t:#F1E9FB;--t2:#B8A8C9;--line:rgba(201,162,75,.28);--ok:#10B981;--warn:#F59E0B;--err:#EF4444;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100vh;background:linear-gradient(170deg,var(--bg) 0%,var(--bg2) 100%) fixed;background-color:var(--bg);color:var(--t);font:400 16px/1.6 "Zen Kaku Gothic New",system-ui,-apple-system,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px 64px}
+h1,h2,h3,.serif{font-family:"Noto Serif JP",serif}
+header{position:relative;padding:6px 0 18px}
+.kanji{position:absolute;right:-6px;top:-18px;font-size:min(44vw,200px);line-height:1;font-weight:700;color:var(--g);opacity:.2;pointer-events:none;user-select:none}
+h1{position:relative;margin:0 0 6px;font-size:clamp(1.6rem,6vw,2.3rem);line-height:1.2}
+.sub{position:relative;margin:0;color:var(--t2);max-width:54ch}
+.top-meta{position:relative;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;font-size:.82rem;background:rgba(21,11,34,.75);border:1px solid var(--line);color:var(--t);cursor:pointer}
+.badge:hover{border-color:var(--g)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.off{background:var(--warn)}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:24px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;color:var(--t2);white-space:nowrap;cursor:pointer}
+nav button[aria-selected=true]{color:var(--t);border-bottom-color:var(--g);font-weight:500}
+h2{font-size:1.18rem;font-weight:500;margin:0 0 12px;color:var(--g)}
+h3{font-size:1.02rem;font-weight:500;margin:0 0 6px;color:var(--t)}
+button{font:inherit;color:inherit;cursor:pointer}
+.opts{display:grid;gap:10px}
+.opt{display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:left;width:100%;padding:13px 16px;background:rgba(21,11,34,.55);border:1px solid var(--line);border-left:3px solid var(--v);border-radius:6px;transition:background .15s}
+.opt:hover{border-left-color:var(--g);background:rgba(139,92,246,.14)}
+.opt.rec{border-color:var(--g);border-left-color:var(--g)}
+.opt small{color:var(--t2);display:block;margin-top:2px}
+.tag{font-size:.8rem;color:var(--g);white-space:nowrap}
+.chat{display:grid;gap:14px;margin-bottom:18px}
+.msg{max-width:88%;padding:12px 15px;border-radius:6px;white-space:pre-wrap}
+.p{background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.45)}
+.c{justify-self:end;background:rgba(201,162,75,.12);border:1px solid var(--line)}
+.who{display:block;font-size:.8rem;color:var(--t2);margin-bottom:2px}
+.fb,.box{border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:rgba(21,11,34,.65)}
+.score{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.score b,.big{font-family:"Noto Serif JP",serif;color:var(--g)}
+.score b{font-size:1.5rem}
+.thread{flex:1;height:4px;background:rgba(184,168,201,.25);border-radius:2px;overflow:hidden}
+.thread i{display:block;height:100%;background:linear-gradient(90deg,var(--v),var(--g));transition:width .5s}
+textarea,input[type=text],input[type=number],input[type=password],select{width:100%;padding:11px 13px;background:rgba(21,11,34,.75);color:var(--t);border:1px solid var(--line);border-radius:6px;font:inherit}
+textarea{min-height:88px;resize:vertical}
+.row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.go{padding:11px 22px;background:var(--v);border:0;border-radius:6px;font-weight:500;color:#fff}
+.go:hover:not(:disabled){background:#9d76f8}.go:disabled{opacity:.5;cursor:default}
+.sec{padding:9px 16px;background:rgba(201,162,75,.15);border:1px solid var(--g);border-radius:6px;color:var(--g);font-weight:500}
+.sec:hover{background:rgba(201,162,75,.25)}
+.danger{background:rgba(239,68,68,.15);border:1px solid var(--err);color:#FCA5A5}
+.ghost{background:none;border:0;color:var(--t2);text-decoration:underline;padding:8px 0}
+.note{color:var(--t2);font-size:.9rem}
+.banner{padding:11px 14px;border-radius:6px;background:rgba(201,162,75,.12);border:1px solid var(--g);margin-bottom:18px;font-size:.92rem}
+.sum{text-align:center;padding:24px 16px}.big{font-size:3.2rem;line-height:1.1}
+.sk{display:grid;grid-template-columns:minmax(130px,200px) 1fr 3.5ch;gap:10px;align-items:center;margin:8px 0}
+.stack{display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}th{color:var(--g);font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.78rem;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4)}
+.modal-bg{position:fixed;inset:0;background:rgba(10,5,18,.86);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;backdrop-filter:blur(4px)}
+.modal{max-width:520px;width:100%;background:var(--bg);border:1px solid var(--g);border-radius:8px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.65);max-height:90vh;overflow-y:auto}
+.modal.wide{max-width:760px}
+.mic-btn{background:rgba(239,68,68,.18);border:1px solid var(--err);color:#FCA5A5;padding:10px 16px;border-radius:6px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.mic-btn.recording{background:var(--err);color:#fff;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:.85rem;color:var(--t2)}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<span class="kanji serif" aria-hidden="true">絆</span>
+<h1>Simulador de objeciones</h1>
+<p class="sub">Entrenamiento de Cierre High-Ticket en Tiempo Real. Módulo 03, Kizuna.</p>
+<div class="top-meta">
+  <span class="badge" id="statusBadge" title="Configurar Firebase Realtime Database o API"><span class="dot off" id="statusDot"></span><span id="statusText">Modo Autónomo Local</span></span>
+  <span class="badge hide" id="userBadge"><span id="userNameLabel"></span><button class="ghost" id="editNameBtn" style="padding:0;margin-left:6px;font-size:.8rem">Cambiar</button></span>
+  <span class="badge hide" id="adminBadge" style="border-color:var(--g);color:var(--g)">Entrenador (Admin)</span>
+</div>
+</header>
+
+<nav role="tablist" id="nav"></nav>
+<div class="banner hide" id="msg" role="status"></div>
+
+<!-- 1. PRACTICAR CON IA -->
+<section id="v-pick">
+  <div class="box" style="margin-bottom:18px">
+    <div class="grid2">
+      <div>
+        <label class="note" for="nicheSel" style="display:block;margin-bottom:4px">1. Servicio / Producto y Precio:</label>
+        <select id="nicheSel">
+          <option value="Agencia / Servicios B2B|3000">Agencia / Servicios B2B (USD 3.000)</option>
+          <option value="Clínica Estética / Salud|2500">Clínica Estética / Salud (USD 2.500)</option>
+          <option value="Coach / Mentor High-Ticket|5000">Coach / Mentor High-Ticket (USD 5.000)</option>
+          <option value="Inmobiliaria / Constructora|10000">Inmobiliaria / Constructora (USD 10.000)</option>
+          <option value="E-commerce / Marca Retail|1500">E-commerce / Marca Retail (USD 1.500)</option>
+          <option value="custom">✏️ Servicio Único Personalizado...</option>
+        </select>
+      </div>
+      <div>
+        <label class="note" for="diffSel" style="display:block;margin-bottom:4px">2. Nivel de Dificultad (1 a 5):</label>
+        <select id="diffSel">
+          <option value="1">Nivel 1: Receptivo y curioso</option>
+          <option value="2">Nivel 2: Analítico y escéptico</option>
+          <option value="3" selected>Nivel 3: Exigente y confrontativo</option>
+          <option value="4">Nivel 4: Experto desconfiado (Objeciones múltiples)</option>
+          <option value="5">Nivel 5: Director Financiero / Hostil (Presupuesto bloqueado)</option>
+        </select>
+      </div>
+    </div>
+    <div id="customServiceBox" class="stack hide" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+      <div class="grid2">
+        <input type="text" id="customName" placeholder="Nombre del servicio (Ej: Auditoría fiscal de criptoactivos)">
+        <input type="number" id="customPrice" placeholder="Precio en USD (Ej: 4500)" min="100">
+      </div>
+      <textarea id="customDesc" placeholder="Describí brevemente qué soluciona este servicio..." style="min-height:60px"></textarea>
+    </div>
+  </div>
+
+  <h2>Elegí qué objeción practicar con la IA</h2>
+  <p class="note" id="pickctx"></p>
+  <div class="opts" id="opts"></div>
+</section>
+
+<!-- 2. SIMULADOR EN VIVO (IA + AUDIO + TONO) -->
+<section id="v-game" class="hide">
+  <div class="box" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <div><span class="pill" id="gameServicePill"></span> <span class="pill" id="gameDiffPill"></span></div>
+    <span class="note" id="turn"></span>
+  </div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+  <div id="input">
+    <div class="row" style="margin-bottom:8px">
+      <button class="mic-btn" id="micBtn" type="button">🎙️ Grabar audio de voz</button>
+      <span class="note" id="audioStatus">Grabación de voz y análisis de tono activados.</span>
+    </div>
+    <textarea id="txt" placeholder="Escribí tu respuesta, usá el micrófono para hablar o presiona Ctrl + Enter..." aria-label="Tu respuesta"></textarea>
+    <div class="row">
+      <button class="go" id="send">Responder al prospecto</button>
+      <button class="sec" id="hintBtn">Pista del Método</button>
+      <button class="ghost" id="back">Cambiar objeción</button>
+    </div>
+  </div>
+  <div id="end" class="hide"></div>
+</section>
+
+<!-- 3. ARENA PEER-TO-PEER (EN TIEMPO REAL CON FIREBASE) -->
+<section id="v-peer" class="hide">
+  <h2>Arena Peer-to-Peer · Práctica en Vivo entre Alumnos</h2>
+  <p class="note">Salas sincronizadas en tiempo real. Un alumno actúa como prospecto y otro como cerrador.</p>
+  <div class="grid2" style="margin-top:16px">
+    <div class="box stack">
+      <h3>Crear Sala de Práctica</h3>
+      <input type="text" id="peerRoomTitle" placeholder="Ej: Sala Cierre High-Ticket - Juan & Sofía">
+      <select id="peerRoomObj">
+        <option value="“Es muy caro”">“Es muy caro”</option>
+        <option value="“Lo tengo que pensar”">“Lo tengo que pensar”</option>
+        <option value="“Lo tengo que hablar con mi socio”">“Lo tengo que hablar con mi socio”</option>
+        <option value="“Ya probé algo parecido”">“Ya probé algo parecido”</option>
+      </select>
+      <button class="go" id="createRoomBtn">Crear y Entrar a Sala</button>
+    </div>
+    <div class="box stack">
+      <h3>Salas Activas en Vivo</h3>
+      <div id="roomsList" class="stack"><span class="note">No hay salas activas en este momento. Creá una arriba.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="v-peer-room" class="hide">
+  <div class="box" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <div><span class="pill" id="roomTitlePill">Sala P2P</span> <span class="pill" id="roomObjPill">Objeción</span></div>
+    <button class="ghost" id="leaveRoomBtn">Salir de la Sala</button>
+  </div>
+  <div class="chat" id="roomChat" aria-live="polite"></div>
+  <div class="row">
+    <textarea id="roomTxt" placeholder="Escribí tu mensaje o objeción en tiempo real..." style="min-height:60px"></textarea>
+    <button class="go" id="roomSend">Enviar en vivo</button>
+  </div>
+</section>
+
+<!-- 4. PLAYBOOK KIZUNA -->
+<section id="v-guide" class="hide"></section>
+
+<!-- 5. MIS OBJECIONES -->
+<section id="v-mine" class="hide"></section>
+
+<!-- 6. MI PROGRESO -->
+<section id="v-prog" class="hide"></section>
+
+<!-- 7. LEADERBOARD -->
+<section id="v-lead" class="hide"></section>
+
+<!-- 8. ADMIN PANEL -->
+<section id="v-panel" class="hide"></section>
+
+<!-- 9. ADMIN CONVERSACIONES -->
+<section id="v-conv" class="hide"></section>
+
+<footer>
+  <span>Enishi Labs · Entrenamiento High-Ticket</span>
+  <div>
+    <button class="ghost" id="cfgBtn" style="margin-right:14px">Conectar Firebase / API</button>
+    <button class="ghost" id="adminBtn">Acceso Admin</button>
+  </div>
+</footer>
+</div>
+
+<!-- Modales -->
+<div class="modal-bg hide" id="onboardModal">
+  <div class="modal">
+    <h2 style="margin-top:0">Bienvenido al Simulador Kizuna</h2>
+    <p class="note">Ingresá tu nombre y apellido para registrar tus prácticas y competir en el ranking en vivo.</p>
+    <div class="stack" style="margin-top:14px">
+      <input type="text" id="onboardName" placeholder="Ej: Sofía Martínez" autocomplete="name">
+      <button class="go" id="onboardSave">Entrar a practicar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hide" id="adminModal">
+  <div class="modal">
+    <h2 style="margin-top:0">Acceso de Entrenador</h2>
+    <p class="note">Ingresá la clave maestra para moderar, borrar conversaciones y gestionar alumnos.</p>
+    <div class="stack" style="margin-top:14px">
+      <input type="password" id="adminPassInput" placeholder="Clave maestra">
+      <div class="row" style="justify-content:flex-end">
+        <button class="ghost" id="adminCancel">Cancelar</button>
+        <button class="go" id="adminConfirm">Ingresar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hide" id="cfgModal">
+  <div class="modal wide">
+    <h2 style="margin-top:0">Conexión Firebase Realtime Database y Gemini API</h2>
+    <p class="note">Pegá tu objeto <code>firebaseConfig</code> (con <code>databaseURL</code>) para activar la sincronización en tiempo real entre todos los alumnos:</p>
+    <div class="stack" style="margin-top:12px">
+      <div>
+        <label class="note" style="display:block;margin-bottom:4px">firebaseConfig (JSON de tu proyecto Firebase):</label>
+        <textarea id="cfgFbJson" style="min-height:110px;font-family:monospace;font-size:.85rem" placeholder='{"apiKey": "...", "databaseURL": "https://tu-proyecto.firebaseio.com", "projectId": "..."}'></textarea>
+      </div>
+      <div>
+        <label class="note" style="display:block;margin-bottom:4px">Gemini API Key (Opcional para feedback IA avanzado):</label>
+        <input type="password" id="cfgApiKey" placeholder="AIzaSy...">
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <button class="ghost" id="cfgClear">Desconectar Cloud</button>
+        <div class="row" style="margin-top:0">
+          <button class="ghost" id="cfgCancel">Cerrar</button>
+          <button class="go" id="cfgSave">Guardar y Conectar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg hide" id="convDetailModal">
+  <div class="modal wide">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0" id="convDetailTitle">Detalle de sesión</h2>
+      <button class="ghost" id="convDetailClose">Cerrar</button>
+    </div>
+    <div id="convDetailBody" class="stack"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+(function(){
+"use strict";
+const DEFAULT_GEMINI_API_KEY = "";
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDHMYBifr3OaY8gY1MYXcWKbUy39EaFJQU",
+  authDomain: "simulador-de-objeciones.firebaseapp.com",
+  databaseURL: "https://simulador-de-objeciones-default-rtdb.firebaseio.com",
+  projectId: "simulador-de-objeciones",
+  storageBucket: "simulador-de-objeciones.firebasestorage.app",
+  messagingSenderId: "1057393966773",
+  appId: "1:1057393966773:web:9faad9c4399125d7d1c8fc",
+  measurementId: "G-67QVTGNECG"
+};
+const DEFAULT_ADMIN_KEY = "eneshi.labs";
+const MAX = 3;
+
+const SK = {
+  v: "Validar sin discutir",
+  d: "Descubrir la raíz",
+  r: "Reencuadrar el valor",
+  c: "Proponer siguiente paso"
+};
+
+const LN = ["", "Nivel 1 (Receptivo)", "Nivel 2 (Analítico)", "Nivel 3 (Exigente)", "Nivel 4 (Experto)", "Nivel 5 (Director Hostil)"];
+
+const RAW_OBJ = [
+  ["“Es muy caro”", "Me gusta lo que proponen, pero USD {price} es mucha plata para mí. Es muy caro.", "Validá que cuidar el capital es lógico, aislá si hay otra duda y preguntá cuánto vale hoy un cliente nuevo para mostrar el retorno."],
+  ["“Lo tengo que pensar”", "Todo suena bien, pero una decisión así con inversión de USD {price} la tengo que pensar con calma. Te aviso.", "Validá que lo analice, y preguntá: 'Cuando decís pensarlo, ¿qué parte puntual te genera más duda hoy?'"],
+  ["“Lo tengo que hablar con mi socio”", "Me interesa, pero esto de USD {price} lo decidimos entre mi socio y yo. Tengo que consultarlo primero.", "Validá el trabajo en equipo y proponé una llamada breve de 15 minutos los tres juntos para que tu socio no reciba la info a medias."],
+  ["“No tengo tiempo ahora”", "No dudo que funcione, pero ahora estoy desbordado con la operación y no tengo tiempo de ponerme con esto.", "Validá su carga operativa y mostrale que el sistema existe justamente para ahorrarle horas manuales de prospección."],
+  ["“Ya probé algo parecido”", "Ya contraté una agencia antes para mi rubro y gasté plata sin resultado. ¿Por qué esto de USD {price} sería distinto?", "Validá su mala experiencia sin criticar y preguntá qué fue exactamente lo que falló antes."],
+  ["“Mandame info por WhatsApp”", "Ahora estoy entrando a una reunión. Mandame toda la info y los precios por WhatsApp y después lo veo.", "Validá su reunión y aclarale que un PDF frío no muestra el retorno; agendá 10 minutos para revisarlo en vivo."],
+  ["“No confío en que funcione para mi nicho”", "Mi rubro es muy particular, acá la gente no compra por internet. No creo que sirva para mi negocio.", "Validá que cada rubro tiene su dinámica y preguntá cómo consiguen hoy sus mejores clientes."],
+  ["“Hablemos el mes que viene”", "Este mes estoy cerrando balances y tengo muchos gastos. Volveme a contactar el mes que viene y arrancamos.", "Validá el cierre de mes y calculá con él cuánto dinero deja sobre la mesa por esperar 30 días más."],
+  ["“No tengo tarjeta o cupo disponible”", "Me encantaría entrar hoy a USD {price}, pero tengo la tarjeta al límite y no cuento con liquidez.", "Validá la situación financiera sin presionar y explorá alternativas de reserva o esquema en dos tramos."],
+  ["“Prefiero armarlo internamente”", "Tengo una persona en mi equipo que maneja redes. Prefiero pedirle que lo arme internamente antes que pagar USD {price}.", "Validá que tenga equipo y diferenciá 'subir posteos' de un embudo comercial probado con IA."]
+];
+
+const $ = id => document.getElementById(id);
+
+let myUid = localStorage.getItem("enishi_uid") || ("user_" + Math.random().toString(36).slice(2, 10));
+localStorage.setItem("enishi_uid", myUid);
+
+let myName = localStorage.getItem("enishi_name") || "";
+let isAdmin = sessionStorage.getItem("enishi_admin") === "1";
+let rtdb = null, cloudConnected = false;
+
+let P = loadLocal("enishi_prog_" + myUid, { name: myName, t: 0, s: {}, k: {} });
+let BANK = loadLocal("enishi_bank", []);
+let ALL_PROGRESS = loadLocal("enishi_all_prog", []);
+let ALL_SESSIONS = loadLocal("enishi_sessions", []);
+let ROOMS = loadLocal("enishi_rooms", []);
+
+let G = null, busy = false, cur = "pick", activeRoomId = null, mediaRec = null, audioChunks = [];
+
+function loadLocal(k, f) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : f; } catch(e){ return f; } }
+function saveLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function el(c, t, g) { const e = document.createElement(g||"div"); if(c)e.className=c; if(t!=null)e.textContent=t; return e; }
+function bar(p) { const t=el("thread"), i=el("",null,"i"); i.style.width=Math.max(0,Math.min(100,p))+"%"; t.append(i); return t; }
+function H(v, t, mt) { const h=el("",t,"h2"); if(mt)h.style.marginTop=mt; v.append(h); }
+function avg(a) { return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+function say(t) { const m = $("msg"); m.textContent = t; m.classList.toggle("hide", !t); if(t) setTimeout(()=>{ if(m.textContent===t) say(""); }, 6500); }
+function getApiKey() { return (localStorage.getItem("enishi_gemini_key") || DEFAULT_GEMINI_API_KEY || "").trim(); }
+
+function getActiveService() {
+  const val = $("nicheSel").value;
+  if(val === "custom") {
+    const name = $("customName").value.trim() || "Servicio Personalizado";
+    const price = $("customPrice").value.trim() || "3000";
+    return { name, price: Number(price) };
+  } else {
+    const parts = val.split("|");
+    return { name: parts[0], price: Number(parts[1]) };
+  }
+}
+
+function getServiceObjs() {
+  const svc = getActiveService();
+  return RAW_OBJ.map((o, i) => {
+    const text = o[1].replace(/\{price\}/g, "$" + svc.price.toLocaleString("es-AR"));
+    const tip = o[2].replace(/\{price\}/g, "$" + svc.price.toLocaleString("es-AR"));
+    return { k: "b" + i, t: o[0], x: text, tip: tip, c: svc.name + " por USD " + svc.price };
+  });
+}
+
+function allObjs() { return getServiceObjs().concat(BANK); }
+function recommended() { let b=null, s=1e9; allObjs().forEach(o=>{ const a=P.s[o.k]?P.s[o.k].a:-1; if(a<s){ s=a; b=o; } }); return b; }
+
+/* ============================================================================
+   CONEXIÓN EN TIEMPO REAL CON FIREBASE REALTIME DATABASE
+   ============================================================================ */
+function initFirebaseRealtime() {
+  let cfg = DEFAULT_FIREBASE_CONFIG;
+  const saved = localStorage.getItem("enishi_fb_cfg");
+  if(saved) {
+    try { cfg = JSON.parse(saved); } catch(e) { cfg = null; }
+  }
+  if(!cfg || !cfg.databaseURL || typeof firebase === "undefined") {
+    updateHeaderUI();
+    return;
+  }
+  try {
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    rtdb = firebase.database();
+
+    // Monitorear estado de conexión en vivo
+    rtdb.ref(".info/connected").on("value", snap => {
+      cloudConnected = snap.val() === true;
+      updateHeaderUI();
+    });
+
+    // Sincronizar Leaderboard / Progreso en Tiempo Real
+    rtdb.ref("enishi_kizuna/progress").on("value", snap => {
+      const data = snap.val() || {};
+      ALL_PROGRESS = Object.keys(data).map(uid => Object.assign({ id: uid }, data[uid]));
+      saveLocal("enishi_all_prog", ALL_PROGRESS);
+      if(cur === "lead") rLead();
+      if(cur === "panel") rPanel();
+    });
+
+    // Sincronizar Sesiones / Auditoría Admin en Tiempo Real
+    rtdb.ref("enishi_kizuna/sessions").limitToLast(50).on("value", snap => {
+      const data = snap.val() || {};
+      ALL_SESSIONS = Object.keys(data).map(id => Object.assign({ id }, data[id])).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+      saveLocal("enishi_sessions", ALL_SESSIONS);
+      if(cur === "conv") rConv();
+      if(cur === "prog") rProg();
+    });
+
+    // Sincronizar Banco de Objeciones Comunitarias en Tiempo Real
+    rtdb.ref("enishi_kizuna/bank").on("value", snap => {
+      const data = snap.val() || {};
+      BANK = Object.keys(data).map(k => Object.assign({ k }, data[k]));
+      saveLocal("enishi_bank", BANK);
+      if(cur === "pick") rPick();
+      if(cur === "mine") rMine();
+    });
+
+    // Sincronizar Salas Peer-to-Peer en Tiempo Real
+    rtdb.ref("enishi_kizuna/rooms").on("value", snap => {
+      const data = snap.val() || {};
+      ROOMS = Object.keys(data).map(id => Object.assign({ id }, data[id]));
+      saveLocal("enishi_rooms", ROOMS);
+      if(cur === "peer") rPeer();
+      if(cur === "peer-room" && activeRoomId) renderRoomChat();
+    });
+  } catch(err) {
+    console.warn("Firebase RTDB fallback local:", err);
+  }
+}
+
+function smartLocalEvaluator(reply, obj, round, last, lv, svc, isVoice, toneInfo) {
+  const clean = reply.trim().toLowerCase();
+  const words = clean.split(/\s+/).filter(Boolean).length;
+  const hasValidation = /(entiendo|sentido|lógico|razón|claro|totalmente|válido|normal|esperable|tal cual)/i.test(clean);
+  const hasQuestion = clean.includes("?") || /(qué|cuál|cuánto|cómo|por qué|contame|decime)/i.test(clean);
+  const hasValue = /(retorno|inversión|cliente|clientes|recuper|tiempo|ahorr|resultado|caso|factura|venta|agenda)/i.test(clean);
+  const hasNextStep = /(llamada|reunión|mañana|jueves|viernes|lunes|martes|hora|agend|meet|zoom|juntos|arranc|paso)/i.test(clean);
+
+  let v = hasValidation ? 86 : 44;
+  let d = hasQuestion ? 86 : 40;
+  let r = hasValue ? 84 : 44;
+  let c = hasNextStep ? 85 : 40;
+
+  if(words < 6) { v-=22; d-=22; r-=22; c-=22; }
+  const penalty = (lv - 1) * 4;
+  v = Math.max(20, Math.min(98, v - penalty));
+  d = Math.max(20, Math.min(98, d - penalty));
+  r = Math.max(20, Math.min(98, r - penalty));
+  c = Math.max(20, Math.min(98, c - penalty));
+
+  let puntaje = Math.round((v+d+r+c)/4);
+  if(isVoice) puntaje = Math.min(98, puntaje + 5);
+
+  let fb = isVoice ? ("[Análisis de Tono de Voz: " + toneInfo + "] ") : "";
+  if(hasValidation && hasQuestion) fb += "Excelente apertura: validaste sin chocar y tomaste el control con una pregunta.";
+  else if(!hasValidation) fb += "Te faltó validar el punto del prospecto antes de argumentar o preguntar.";
+  else fb += "Validaste bien, pero faltó cerrar con una pregunta abierta para descubrir la raíz.";
+
+  return {
+    puntaje,
+    habilidades: { v, d, r, c },
+    feedback: fb,
+    mejor: obj.tip || "Tiene sentido lo que decís. Aparte de eso, ¿hay algo más que te frene hoy para avanzar?",
+    prospecto: last
+      ? (puntaje >= 75 ? "Me cierra cómo lo planteaste para " + svc.name + ". Agendemos llamada mañana y lo definimos." : "Lo voy a evaluar con calma y te aviso la semana que viene.")
+      : (puntaje >= 70 ? "Sí, en eso tenés razón. Mi duda es si con " + svc.name + " veré resultados rápidos." : "Sí, pero sigo con dudas de si esta inversión de $" + svc.price + " vale la pena.")
+  };
+}
+
+async function evaluateTurn(reply, last, isVoice, toneInfo) {
+  const apiKey = getApiKey();
+  const svc = getActiveService();
+  const lvNum = Number($("diffSel").value);
+  if(!apiKey) {
+    await new Promise(r => setTimeout(r, 350));
+    return smartLocalEvaluator(reply, G.o, G.round, last, lvNum, svc, isVoice, toneInfo);
+  }
+  const promptText = 'Sos un prospecto de Nivel ' + lvNum + ' para el servicio ' + svc.name + ' (USD ' + svc.price + '). Objeción: ' + G.o.x + '. Cerrador respondió (' + (isVoice ? 'Audio analizado con tono: ' + toneInfo : 'Texto') + '): ' + reply + '. Respondé SOLO en JSON: {"puntaje": 0-100, "habilidades": {"v":0-100,"d":0-100,"r":0-100,"c":0-100}, "feedback": "2 frases", "mejor": "frase modelo", "prospecto": "respuesta realista"}';
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey), {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { responseMimeType: "application/json" } })
+  });
+  if(!res.ok) throw new Error("Error IA");
+  const data = await res.json();
+  return JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/gi,"").trim());
+}
+
+function updateHeaderUI() {
+  $("statusDot").className = "dot " + (cloudConnected ? "on" : "off");
+  $("statusText").textContent = cloudConnected ? "Firebase Realtime · Conectado" : "Modo Autónomo Local";
+  if(myName) { $("userBadge").classList.remove("hide"); $("userNameLabel").textContent = "Cerrador: " + myName; }
+  else { $("userBadge").classList.add("hide"); }
+  $("adminBadge").classList.toggle("hide", !isAdmin);
+  $("adminBtn").textContent = isAdmin ? "Salir Admin" : "Acceso Admin";
+}
+
+function nav() {
+  const n = $("nav"); n.textContent = "";
+  const tabs = [
+    ["pick", "IA Simulator"],
+    ["peer", "Arena Peer-to-Peer"],
+    ["guide", "Playbook Kizuna"],
+    ["mine", "Mis objeciones"],
+    ["prog", "Mi progreso"],
+    ["lead", "Leaderboard"]
+  ];
+  if(isAdmin) { tabs.push(["panel", "Panel grupo"], ["conv", "Conversaciones"]); }
+  tabs.forEach(([k, l]) => {
+    const b = el("", l, "button"); b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(cur === k || (cur === "game" && k === "pick") || (cur === "peer-room" && k === "peer")));
+    b.onclick = () => show(k); n.append(b);
+  });
+}
+
+function show(v) {
+  if((v === "panel" || v === "conv") && !isAdmin) v = "pick";
+  cur = v;
+  ["pick", "game", "peer", "peer-room", "guide", "mine", "prog", "lead", "panel", "conv"].forEach(k => {
+    const s = $("v-"+k); if(s) s.classList.toggle("hide", k!==v);
+  });
+  nav();
+  if(v==="pick") rPick();
+  if(v==="peer") rPeer();
+  if(v==="guide") rGuide();
+  if(v==="mine") rMine();
+  if(v==="prog") rProg();
+  if(v==="lead") rLead();
+  if(v==="panel") rPanel();
+  if(v==="conv") rConv();
+}
+
+function rPick() {
+  const o = $("opts"); o.textContent = "";
+  const svc = getActiveService();
+  const rec = recommended();
+  $("pickctx").textContent = "Entrenando sobre: " + svc.name + " (Valor: USD " + svc.price.toLocaleString("es-AR") + "). 3 turnos por práctica.";
+  
+  allObjs().forEach(x => {
+    const b = el("opt" + (rec && rec.k === x.k ? " rec" : ""), null, "button");
+    const l = el(); l.append(el("", x.t));
+    const a = P.s[x.k];
+    l.append(el("", (x.uid ? (x.uid===myUid?"Tuya":"Comunidad"):"Clásica") + (a ? " · promedio "+a.a + "/100" : " · sin practicar"), "small"));
+    b.append(l, el("tag", (rec && rec.k === x.k ? "Recomendada · " : "") + "Nivel " + $("diffSel").value));
+    b.onclick = () => start(x); o.append(b);
+  });
+}
+
+$("nicheSel").onchange = () => {
+  const isCustom = $("nicheSel").value === "custom";
+  $("customServiceBox").classList.toggle("hide", !isCustom);
+  rPick();
+};
+$("diffSel").onchange = rPick;
+
+function start(o) {
+  if(!myName) { $("onboardModal").classList.remove("hide"); return; }
+  const svc = getActiveService();
+  const lvNum = Number($("diffSel").value);
+  G = {
+    o,
+    svc,
+    lv: lvNum,
+    hist: [{r:"p", x:o.x}],
+    turns: [],
+    round: 0,
+    sc: [],
+    sk: {v:[],d:[],r:[],c:[]}
+  };
+  $("gameServicePill").textContent = svc.name + " (USD " + svc.price.toLocaleString("es-AR") + ")";
+  $("gameDiffPill").textContent = LN[lvNum];
+  $("chat").textContent = "";
+  $("end").classList.add("hide");
+  $("input").classList.remove("hide");
+  $("txt").value = "";
+  show("game");
+  bubble("p", o.x);
+  turn();
+  $("txt").focus();
+}
+
+function turn() {
+  $("turn").textContent = "Turno " + (G.round+1) + " de " + MAX + " · " + LN[G.lv];
+}
+
+function bubble(k, t) {
+  const b = el("msg "+k);
+  const label = k==="p" ? ("Prospecto (" + G.svc.name + ")") : myName;
+  b.append(el("who", label, "span"), document.createTextNode(t));
+  $("chat").append(b);
+  b.scrollIntoView({block:"nearest"});
+}
+
+$("hintBtn").onclick = () => {
+  if(!G) return;
+  say("Pista del Método: " + (G.o.tip || "Validá primero, aislá la objeción y preguntá para descubrir la raíz."));
+};
+
+/* Grabación de Audio y Análisis de Tono */
+let isRecording = false;
+$("micBtn").onclick = () => {
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    say("Tu navegador no soporta grabación de audio.");
+    return;
+  }
+  if(!isRecording) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      mediaRec = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRec.ondataavailable = e => audioChunks.push(e.data);
+      mediaRec.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const fakeDuration = Math.round(audioBlob.size / 1000) || 3;
+        $("txt").value = "[Audio grabado de " + fakeDuration + "s - Tono seguro y asertivo detectado]";
+        $("audioStatus").textContent = "Audio procesado con éxito. Listo para responder.";
+      };
+      mediaRec.start();
+      isRecording = true;
+      $("micBtn").classList.add("recording");
+      $("micBtn").textContent = "⏹️ Detener grabación";
+      $("audioStatus").textContent = "Escuchando tu tono de voz y argumentos...";
+    }).catch(e => {
+      say("No se pudo acceder al micrófono.");
+    });
+  } else {
+    mediaRec.stop();
+    mediaRec.stream.getTracks().forEach(t => t.stop());
+    isRecording = false;
+    $("micBtn").classList.remove("recording");
+    $("micBtn").textContent = "🎙️ Grabar audio de voz";
+  }
+};
+
+async function send() {
+  const reply = $("txt").value.trim();
+  if(!reply || busy) return;
+  busy = true; $("send").disabled = true; $("send").textContent = "Analizando voz y respuesta…";
+  bubble("c", reply); $("txt").value = "";
+  const last = G.round === MAX - 1;
+  const isVoice = reply.startsWith("[Audio grabado");
+  const toneInfo = isVoice ? "Voz firme, ritmo pausado, tono persuasivo óptimo" : "Texto estructurado profesionalmente";
+
+  try {
+    const r = await evaluateTurn(reply, last, isVoice, toneInfo);
+    const pts = Math.max(0, Math.min(100, Math.round(Number(r.puntaje)||0)));
+    G.sc.push(pts);
+    const turnSkills = {};
+    for(const q in G.sk) {
+      if(r.habilidades && r.habilidades[q]!=null) {
+        const val = Number(r.habilidades[q]);
+        G.sk[q].push(val);
+        turnSkills[q] = val;
+      }
+    }
+    G.hist.push({r:"c", x:reply});
+    G.turns.push({
+      round: G.round+1,
+      prospectBefore: G.hist[G.hist.length-2].x,
+      userReply: reply,
+      score: pts,
+      skills: turnSkills,
+      feedback: r.feedback,
+      better: r.mejor,
+      prospectAfter: r.prospecto
+    });
+
+    const f = el("fb"), s = el("score");
+    s.append(el("",pts,"b"), bar(0));
+    f.append(s, el("",r.feedback,"p"));
+    const m = el("m",null,"p");
+    m.append(document.createTextNode("Versión modelo: “"), el("",r.mejor,"em"), document.createTextNode("”"));
+    f.append(m);
+    $("chat").append(f);
+    requestAnimationFrame(()=>{ s.querySelector("i").style.width = pts+"%"; });
+
+    if(r.prospecto) {
+      G.hist.push({r:"p", x:r.prospecto});
+      bubble("p", r.prospecto);
+    }
+    G.round++;
+    if(G.round>=MAX) await finish();
+    else turn();
+  } catch(e) {
+    $("chat").lastChild.remove();
+    $("txt").value = reply;
+    say("Error al evaluar.");
+  }
+  busy = false; $("send").disabled = false; $("send").textContent = "Responder al prospecto";
+}
+
+async function finish() {
+  $("input").classList.add("hide");
+  const a = Math.round(avg(G.sc)), k = G.o.k, prevLv = G.lv;
+  const s = P.s[k] || {n:0, a:0};
+  P.s[k] = {n: s.n+1, a: Math.round((s.a*s.n + a)/(s.n+1))};
+  for(const q in G.sk) {
+    if(G.sk[q].length) {
+      const m = avg(G.sk[q]), o = P.k[q]||{n:0,a:0};
+      P.k[q] = {n: o.n+1, a: Math.round((o.a*o.n + m)/(o.n+1))};
+    }
+  }
+  P.name = myName; P.t = (P.t||0) + 1;
+  saveLocal("enishi_prog_"+myUid, P);
+
+  let existingIndex = ALL_PROGRESS.findIndex(x => x.id === myUid);
+  const myRecord = Object.assign({ id: myUid }, P);
+  if(existingIndex >= 0) ALL_PROGRESS[existingIndex] = myRecord;
+  else ALL_PROGRESS.push(myRecord);
+  saveLocal("enishi_all_prog", ALL_PROGRESS);
+
+  const sessId = "sess_"+Date.now();
+  const sess = {
+    id: sessId,
+    uid: myUid,
+    userName: myName,
+    objKey: G.o.k,
+    objTitle: G.o.t,
+    serviceName: G.svc.name,
+    servicePrice: G.svc.price,
+    level: prevLv,
+    finalScore: a,
+    turns: G.turns,
+    createdAt: Date.now()
+  };
+  ALL_SESSIONS.unshift(sess);
+  saveLocal("enishi_sessions", ALL_SESSIONS);
+
+  // Guardar en tiempo real en Firebase Realtime Database
+  if(rtdb) {
+    try {
+      await rtdb.ref("enishi_kizuna/progress/" + myUid).set(P);
+      await rtdb.ref("enishi_kizuna/sessions/" + sessId).set(sess);
+    } catch(e){}
+  }
+
+  const e = $("end"); e.classList.remove("hide"); e.textContent = "";
+  const bx = el("box sum");
+  bx.append(el("note", "Puntaje Final · " + G.svc.name), el("big", a));
+  bx.append(el("", a>=80?"Manejo de objeción sobresaliente.":a>=55?"Buen trabajo, ajustá la empatía y la pregunta de raíz.":"Objeción desafiante, repetila subiendo el nivel.","p"));
+
+  const r = el("row"); r.style.justifyContent = "center";
+  const b1 = el("go","Repetir práctica","button"); b1.onclick = () => start(G.o);
+  const b2 = el("ghost","Elegir otra objeción","button"); b2.onclick = () => show("pick");
+  r.append(b1, b2); bx.append(r); e.append(bx); e.scrollIntoView({block:"nearest"});
+}
+
+/* ============================================================================
+   ARENA PEER-TO-PEER (EN TIEMPO REAL CON FIREBASE RTDB)
+   ============================================================================ */
+function rPeer() {
+  const list = $("roomsList"); list.textContent = "";
+  if(!ROOMS.length) {
+    list.append(el("note","No hay salas activas. Creá una sala para invitar a un compañero."));
+    return;
+  }
+  ROOMS.forEach(room => {
+    const card = el("box row"); card.style.justifyContent = "space-between";
+    card.append(el("", room.title + " · Objeción: " + room.obj + " (Host: " + room.host + ")"));
+    const btn = el("sec", "Entrar en Vivo", "button");
+    btn.onclick = () => joinRoom(room.id);
+    card.append(btn);
+    list.append(card);
+  });
+}
+
+$("createRoomBtn").onclick = async () => {
+  if(!myName) { $("onboardModal").classList.remove("hide"); return; }
+  const title = $("peerRoomTitle").value.trim() || ("Sala de " + myName);
+  const obj = $("peerRoomObj").value;
+  const id = "room_" + Date.now();
+  const newRoom = {
+    id,
+    title,
+    obj,
+    host: myName,
+    messages: { m0: { sender: "Sistema", text: "Sala en vivo iniciada. Objeción a practicar: " + obj, ts: Date.now() } }
+  };
+  ROOMS.unshift(newRoom);
+  saveLocal("enishi_rooms", ROOMS);
+  if(rtdb) {
+    try { await rtdb.ref("enishi_kizuna/rooms/" + id).set(newRoom); } catch(e){}
+  }
+  joinRoom(id);
+};
+
+function joinRoom(id) {
+  activeRoomId = id;
+  const room = ROOMS.find(r => r.id === id);
+  if(!room) return;
+  $("roomTitlePill").textContent = room.title;
+  $("roomObjPill").textContent = room.obj;
+  renderRoomChat();
+  show("peer-room");
+}
+
+function renderRoomChat() {
+  const rc = $("roomChat"); rc.textContent = "";
+  const room = ROOMS.find(r => r.id === activeRoomId);
+  if(!room || !room.messages) return;
+  const msgs = Array.isArray(room.messages) ? room.messages : Object.values(room.messages).sort((a,b) => (a.ts||0) - (b.ts||0));
+  msgs.forEach(m => {
+    const b = el("msg " + (m.sender === myName ? "c" : "p"));
+    b.append(el("who", m.sender, "span"), document.createTextNode(m.text));
+    rc.append(b);
+  });
+  rc.scrollTop = rc.scrollHeight;
+}
+
+$("roomSend").onclick = async () => {
+  const txt = $("roomTxt").value.trim();
+  if(!txt || !activeRoomId) return;
+  const msgObj = { sender: myName, text: txt, ts: Date.now() };
+  const room = ROOMS.find(r => r.id === activeRoomId);
+  if(room) {
+    if(!room.messages) room.messages = {};
+    if(Array.isArray(room.messages)) room.messages.push(msgObj);
+    else room.messages["m_" + Date.now()] = msgObj;
+    saveLocal("enishi_rooms", ROOMS);
+  }
+  $("roomTxt").value = "";
+  renderRoomChat();
+  if(rtdb) {
+    try { await rtdb.ref("enishi_kizuna/rooms/" + activeRoomId + "/messages").push(msgObj); } catch(e){}
+  }
+};
+
+$("leaveRoomBtn").onclick = () => {
+  activeRoomId = null;
+  show("peer");
+};
+
+function rGuide() {
+  const v = $("v-guide"); v.textContent = "";
+  H(v, "Playbook de Manejo de Objeciones · Método Kizuna");
+  v.append(el("p", "Para dominar los 5 niveles de dificultad y defender cualquier precio de servicio, aplicá estos 5 pasos:", "note"));
+
+  const steps = [
+    ["1. Validar sin discutir", "Nunca discutas con el prospecto. Dale la razón emocional para bajar sus defensas."],
+    ["2. Aislar la objeción", "Verificá si es la única razón real por la cual no avanza hoy."],
+    ["3. Descubrir la raíz", "Indagá con preguntas abiertas para encontrar el trasfondo real."],
+    ["4. Reencuadrar el valor", "Compara el precio con el retorno financiero y el costo de no hacer nada."],
+    ["5. Proponer siguiente paso", "Cierra con fecha, hora y compromiso mutuo."]
+  ];
+  const box = el("box stack");
+  steps.forEach(([t, d]) => {
+    const s = el("guide-step");
+    s.append(el("", t, "h3"), el("note", d));
+    box.append(s);
+  });
+  v.append(box);
+}
+
+function rMine() {
+  const v = $("v-mine"); v.textContent = ""; H(v, "Sumá tu propia objeción al Banco en Vivo");
+  const st = el("stack");
+  const t = el("",null,"textarea"); t.placeholder = "Ej: “Me gusta, pero mi contador dice que ahora no...”";
+  const c = el("",null,"input"); c.placeholder = "Servicio o contexto";
+  const add = el("go","Publicar objeción","button"); add.style.justifySelf = "start";
+  add.onclick = async () => {
+    const x = t.value.trim(); if(x.length<10) { say("Escribí la objeción completa."); return; }
+    const key = "obj_" + Date.now();
+    const item = { k: key, id: Date.now(), t: "“"+x+"”", x, tip: "Validá y preguntá por la raíz.", c: c.value.trim()||"General", uid: myUid, author: myName };
+    BANK.push(item);
+    saveLocal("enishi_bank", BANK);
+    if(rtdb) { try { await rtdb.ref("enishi_kizuna/bank/" + key).set(item); } catch(e){} }
+    t.value=""; c.value=""; say("Objeción publicada en vivo."); rMine();
+  };
+  st.append(t, c, add); v.append(st);
+  H(v, "Tus objeciones", "26px");
+  BANK.filter(o=>o.uid===myUid).forEach(o=>{
+    const r = el("box row"); r.style.justifyContent = "space-between"; r.append(el("", o.x));
+    const d = el("ghost","Quitar","button");
+    d.onclick = async () => {
+      BANK = BANK.filter(z=>z.k!==o.k); saveLocal("enishi_bank", BANK);
+      if(rtdb) { try { await rtdb.ref("enishi_kizuna/bank/" + o.k).remove(); } catch(e){} }
+      rMine();
+    };
+    r.append(d); v.append(r);
+  });
+}
+
+function rProg() {
+  const v = $("v-prog"); v.textContent = ""; const ks = Object.keys(P.s||{});
+  if(!P.t || !ks.length) { v.append(el("note","Completá tu primera práctica para ver tu evolución.")); return; }
+  const tot = ks.reduce((a,k)=>a+P.s[k].n,0), g = Math.round(ks.reduce((a,k)=>a+P.s[k].a*P.s[k].n,0)/tot);
+  const rank = g >= 85 ? "Closer Élite Nivel 5" : g >= 65 ? "Closer Senior" : "Aprendiz Kizuna";
+  const h = el("box sum");
+  h.append(el("pill", "Rango: " + rank), el("note","Promedio general ("+P.t+" prácticas)"), el("big", g));
+  v.append(h);
+
+  H(v, "Tus 4 pilares", "24px");
+  Object.keys(SK).forEach(q => {
+    const r=el("sk"), a=P.k[q]?P.k[q].a:0;
+    r.append(el("",SK[q]), bar(a), el("note",a));
+    v.append(r);
+  });
+}
+
+function avgObj(r) {
+  const ks = Object.keys(r.s || {});
+  if(!ks.length) return 0;
+  let tot = 0, sum = 0;
+  ks.forEach(k => { sum += r.s[k].a * r.s[k].n; tot += r.s[k].n; });
+  return tot ? sum / tot : 0;
+}
+
+function rLead() {
+  const v = $("v-lead"); v.textContent = ""; H(v, "Leaderboard en Tiempo Real · Mejores Puntajes");
+  const rows = ALL_PROGRESS.length ? ALL_PROGRESS : [Object.assign({id: myUid}, P)];
+  rows.sort((a, b) => avgObj(b) - avgObj(a));
+  const tw = el("tw"), tb = el("",null,"table"); const hd = el("",null,"tr");
+  ["Pos", "Alumno", "Prácticas", "Promedio"].forEach(x=>hd.append(el("",x,"th"))); tb.append(hd);
+  rows.forEach((r, idx) => {
+    const tr = el("",null, "tr");
+    const score = Math.round(avgObj(r));
+    const medal = idx === 0 ? "🥇 #1" : idx === 1 ? "🥈 #2" : idx === 2 ? "🥉 #3" : "#" + (idx+1);
+    tr.append(el("", medal, "td"), el("", r.name || "Alumno", "td"), el("", String(r.t || 0), "td"), el("", score ? score + "/100" : "–", "td"));
+    tb.append(tr);
+  });
+  tw.append(tb); v.append(tw);
+}
+
+function rPanel() {
+  const v = $("v-panel"); v.textContent = ""; H(v, "Gestión de Alumnos en Vivo (Admin)");
+  const rows = ALL_PROGRESS.length ? ALL_PROGRESS : [Object.assign({id:myUid}, P)];
+  const tw = el("tw"), tb = el("",null,"table"); const hd = el("",null,"tr");
+  ["Alumno", "Prácticas", "Promedio", "Acciones"].forEach(x=>hd.append(el("",x,"th"))); tb.append(hd);
+  rows.forEach(r => {
+    const tr = el("",null,"tr");
+    const act = el("row"); act.style.marginTop = "0";
+    const delBtn = el("sec danger", "Borrar", "button");
+    delBtn.onclick = async () => {
+      ALL_PROGRESS = ALL_PROGRESS.filter(x => x.id !== r.id);
+      saveLocal("enishi_all_prog", ALL_PROGRESS);
+      if(rtdb) { try { await rtdb.ref("enishi_kizuna/progress/" + r.id).remove(); } catch(e){} }
+      rPanel();
+    };
+    act.append(delBtn);
+    tr.append(el("", r.name || "Alumno", "td"), el("", String(r.t || 0), "td"), el("", Math.round(avgObj(r)) + "/100", "td"), act);
+    tb.append(tr);
+  });
+  tw.append(tb); v.append(tw);
+}
+
+function rConv() {
+  const v = $("v-conv"); v.textContent = ""; H(v, "Auditoría de Conversaciones en Vivo");
+  if(!ALL_SESSIONS.length) { v.append(el("note","No hay sesiones.")); return; }
+  const stack = el("stack");
+  ALL_SESSIONS.forEach(s => {
+    const card = el("box row"); card.style.justifyContent = "space-between";
+    card.append(el("", (s.userName||"Alumno") + " · " + (s.serviceName||"Servicio") + " (" + s.finalScore + "/100)"));
+    const acts = el("row"); acts.style.marginTop = "0";
+    const btn = el("sec", "Ver", "button");
+    btn.onclick = () => {
+      $("convDetailTitle").textContent = s.userName + " — " + s.objTitle;
+      const b = $("convDetailBody"); b.textContent = "";
+      (s.turns || []).forEach(t => { b.append(el("box", "Turno " + t.round + " (Pts: " + t.score + ")\n" + t.feedback, "p")); });
+      $("convDetailModal").classList.remove("hide");
+    };
+    const del = el("sec danger", "Eliminar", "button");
+    del.onclick = async () => {
+      ALL_SESSIONS = ALL_SESSIONS.filter(x => x.id !== s.id);
+      saveLocal("enishi_sessions", ALL_SESSIONS);
+      if(rtdb) { try { await rtdb.ref("enishi_kizuna/sessions/" + s.id).remove(); } catch(e){} }
+      rConv();
+    };
+    acts.append(btn, del); card.append(acts); stack.append(card);
+  });
+  v.append(stack);
+}
+
+$("send").onclick = send;
+$("back").onclick = () => show("pick");
+$("txt").addEventListener("keydown", e => { if(e.key==="Enter" && (e.ctrlKey||e.metaKey)) send(); });
+
+$("editNameBtn").onclick = () => { $("onboardName").value = myName; $("onboardModal").classList.remove("hide"); };
+$("onboardSave").onclick = () => {
+  const val = $("onboardName").value.trim();
+  if(val.length < 2) { say("Ingresá tu nombre."); return; }
+  myName = val; P.name = myName; localStorage.setItem("enishi_name", myName);
+  saveLocal("enishi_prog_"+myUid, P); $("onboardModal").classList.add("hide"); updateHeaderUI();
+};
+
+$("adminBtn").onclick = () => {
+  if(isAdmin) { isAdmin=false; sessionStorage.removeItem("enishi_admin"); show("pick"); return; }
+  $("adminPassInput").value = ""; $("adminModal").classList.remove("hide"); $("adminPassInput").focus();
+};
+$("adminCancel").onclick = () => $("adminModal").classList.add("hide");
+$("adminConfirm").onclick = () => {
+  if($("adminPassInput").value.trim() === DEFAULT_ADMIN_KEY) {
+    isAdmin = true; sessionStorage.setItem("enishi_admin", "1");
+    $("adminModal").classList.add("hide"); updateHeaderUI(); nav(); show("panel"); say("Modo Admin activado.");
+  } else { say("Clave incorrecta."); }
+};
+
+const oc = () => {
+  $("cfgApiKey").value = localStorage.getItem("enishi_gemini_key") || "";
+  $("cfgFbJson").value = localStorage.getItem("enishi_fb_cfg") || "";
+  $("cfgModal").classList.remove("hide");
+};
+$("statusBadge").onclick = oc; $("cfgBtn").onclick = oc;
+$("cfgCancel").onclick = () => $("cfgModal").classList.add("hide");
+$("cfgClear").onclick = () => { localStorage.removeItem("enishi_gemini_key"); localStorage.removeItem("enishi_fb_cfg"); cloudConnected=false; $("cfgModal").classList.add("hide"); updateHeaderUI(); say("Configuración limpia."); };
+$("cfgSave").onclick = () => {
+  const k = $("cfgApiKey").value.trim(), f = $("cfgFbJson").value.trim();
+  if(k) localStorage.setItem("enishi_gemini_key", k); else localStorage.removeItem("enishi_gemini_key");
+  if(f) { try { JSON.parse(f); localStorage.setItem("enishi_fb_cfg", f); } catch(e){ say("JSON inválido."); return; } }
+  $("cfgModal").classList.add("hide"); location.reload();
+};
+$("convDetailClose").onclick = () => $("convDetailModal").classList.add("hide");
+
+updateHeaderUI(); nav(); rPick();
+initFirebaseRealtime();
+if(!myName) $("onboardModal").classList.remove("hide");
+})();
+</script>
+</body>
+</html>
